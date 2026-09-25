@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>سرفصل درس: شبیه‌سازی انرژی و نور (Energy and Daylighting Simulation)</title>
+        <meta name="description" content="طرح درس مقطع کارشناسی ارشد رشته معماری پایدار">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <!-- بارگذاری صحیح و کامل فونت وزیرمتن (Vazirmatn) -->
+        <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="templatemo-633-celadon-style.css">
+        <style>
+            /* اعمال سراسری فونت وزیرمتن با بالاترین اولویت */
+            * {
+                font-family: 'Vazirmatn', sans-serif !important;
+            }
+            body {
+                background-color: #f8fafc;
+                color: #0f172a;
+                direction: rtl;
+                text-align: right;
+            }
+            /* رفع مشکل نا‌خوانایی و شکستن نامناسب تایتل‌ها: تم اصلی برای فونت لاتین طراحی شده بود
+               (letter-spacing منفی و line-height بسیار فشرده) که با فونت فارسی وزیرمتن ناخوانا می‌شد */
+            h1, h2, h3, h4 {
+                letter-spacing: normal;
+                line-height: 1.35;
+            }
+            /* حذف محدودیت عرض بر اساس ch که باعث شکستن نابجای عنوان اصلی به دو خط می‌شد */
+            .hero h1 {
+                max-width: 100%;
+            }
+            /* حذف محدودیت عرض عناوین بخش‌ها که باعث دو خطی شدن نامنظم می‌شد */
+            .h2 {
+                max-width: 100%;
+            }
+            .session-card {
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 24px;
+                margin-bottom: 20px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            }
+            /* جلوگیری از شکستگی نامنظم و چندخطی شدن عناوین کارت‌ها */
+            .session-card h3 {
+                font-size: 1.15rem;
+                font-weight: 600;
+                color: #0f172a;
+                margin-bottom: 16px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .section-main-title {
+                font-size: clamp(1.5rem, 3vw, 2rem);
+                font-weight: 700;
+                color: #0f172a;
+                margin-bottom: 16px;
+                max-width: 100%;
+            }
+            .session-card ul {
+                padding-right: 20px;
+                margin: 0;
+            }
+            .session-card li {
+                margin-bottom: 10px;
+                color: #475569;
+                line-height: 1.7;
+            }
+            .badge-part {
+                display: inline-block;
+                padding: 2px 8px;
+                border-radius: 6px;
+                font-size: 0.85rem;
+                font-weight: 500;
+                background: rgba(13, 148, 136, 0.1);
+                color: #0d9488;
+                margin-left: 8px;
+                white-space: nowrap;
+            }
+            /* نمای گرافیکی ساختار زمانی جلسه به‌جای جدول ساده */
+            .timeline-bar {
+                display: flex;
+                width: 100%;
+                height: 38px;
+                border-radius: 10px;
+                overflow: hidden;
+                margin: 18px 0 14px;
+                box-shadow: inset 0 0 0 1px #e2e8f0;
+            }
+            .tl-seg {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.72rem;
+                font-weight: 600;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+            .tl-seg.tl-teach {
+                background: linear-gradient(135deg, #0d9488, #14b8a6);
+                color: #ffffff;
+            }
+            .tl-seg.tl-break {
+                background: #e2e8f0;
+                color: #64748b;
+                font-weight: 500;
+            }
+            .timeline-legend {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 18px;
+                margin-bottom: 22px;
+                font-size: 0.85rem;
+                color: #475569;
+            }
+            .tl-legend-item {
+                display: inline-flex;
+                align-items: center;
+                gap: 7px;
+            }
+            .tl-dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                display: inline-block;
+                flex-shrink: 0;
+            }
+            .tl-dot.tl-teach { background: #0d9488; }
+            .tl-dot.tl-break { background: #cbd5e1; }
+            .timeline-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+                gap: 10px;
+            }
+            .timeline-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                padding: 12px 16px;
+                border-radius: 10px;
+                background: #f8fafc;
+                border-right: 3px solid #0d9488;
+                font-size: 0.92rem;
+            }
+            .timeline-item.tl-break {
+                border-right-color: #cbd5e1;
+                background: #f1f5f9;
+            }
+            .timeline-item .tl-label {
+                font-weight: 500;
+                color: #0f172a;
+            }
+            .timeline-item.tl-break .tl-label {
+                color: #64748b;
+            }
+            .timeline-item .tl-duration {
+                font-weight: 700;
+                color: #0d9488;
+                font-size: 0.85rem;
+                white-space: nowrap;
+            }
+            .timeline-item.tl-break .tl-duration {
+                color: #64748b;
+                font-weight: 600;
+            }
+            .description-box {
+                font-size: 1rem;
+                color: #334155;
+                line-height: 2;
+                text-align: justify;
+            }
+        </style>
+    </head>
+    <body>
+        <header class="top" id="top">
+            <div class="shell bar">
+                <a class="brand" href="#home"><span class="mark" aria-hidden="true"></span>شبیه‌سازی انرژی و نور</a>
+                <nav class="nav">
+                    <a href="#overview">توضیحات کلی</a>
+                    <a href="#climate">بخش اقلیم</a>
+                    <a href="#daylighting">شبیه‌سازی نور</a>
+                    <a href="#energy">شبیه‌سازی انرژی</a>
+                    <a href="#optimization">بهینه‌یابی</a>
+                </nav>
+                <a class="btn solid" href="#overview">فرایند دوره</a>
+                <button class="burger"
+                        id="burger"
+                        aria-label="Open menu"
+                        aria-expanded="false"
+                        aria-controls="drawer">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </header>
+        
+        <div class="scrim" id="scrim"></div>
+        <aside class="drawer" id="drawer" aria-label="Menu">
+            <span class="dtag">منو</span>
+            <a href="#overview">توضیحات کلی</a>
+            <a href="#climate">بخش اقلیم</a>
+            <a href="#daylighting">شبیه‌سازی نور</a>
+            <a href="#energy">شبیه‌سازی انرژی</a>
+            <a href="#optimization">بهینه‌یابی</a>
+            <a class="btn solid" href="#overview">فرایند دوره </a>
+        </aside>
+
+        <main id="home">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="shell">
+                    <h1 class="rv d1">شبیه‌سازی انرژی و نور</h1>
+                    <p class="sub rv d2">دوره آموزشی مبانی و شبیه سازی انرژی و نور </p>
+                    <div class="acts rv d3">
+                        <a class="btn solid" href="#overview">ارشد معماری پایدار</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Overview Section -->
+            <section class="pad" id="overview">
+                <div class="shell">
+                    <div class="session-card rv" style="margin-bottom: 30px;">
+                        <h3>چه مهارت هایی در طول این دوره آموزش داده خواهد شد؟</h3>
+                        <p class="description-box">
+                            دانشجو در این دوره یاد می‌گیرد چگونه داده‌های آب‌وهوایی EPW را تحلیل کرده و وضعیت آسایش حرارتی را ارزیابی کند. همچنین با استفاده از نرم‌افزارهای راینو، گرس‌هاپر و پلاگین ClimateStudio، نحوه شبیه‌سازی نور طبیعی روز، محاسبه فاکتورهای روشنایی و بررسی عملکرد انرژی ساختمان را به صورت عملی تمرین می‌کند. در انتها نیز توانایی مدل‌سازی سیستم‌های تاسیساتی HVAC و استفاده از الگوریتم‌های بهینه‌یابی جهت بهبود عملکرد طرح‌های معماری را کسب خواهد کرد.
+                        </p>
+                    </div>
+
+                    <div class="session-card rv">
+                        <h3>ساختار زمانی هر جلسه <span class="badge-part">مجموعاً ۱۲۰ دقیقه</span></h3>
+
+                        <div class="timeline-bar" role="img" aria-label="ساختار زمانی جلسه: چهار پارت ۲۵ دقیقه‌ای تدریس با استراحت‌های بین آن‌ها">
+                            <span class="tl-seg tl-teach" style="flex:25;">25</span>
+                            <span class="tl-seg tl-break" style="flex:5;">5</span>
+                            <span class="tl-seg tl-teach" style="flex:25;">25</span>
+                            <span class="tl-seg tl-break" style="flex:10;">10</span>
+                            <span class="tl-seg tl-teach" style="flex:25;">25</span>
+                            <span class="tl-seg tl-break" style="flex:5;">5</span>
+                            <span class="tl-seg tl-teach" style="flex:25;">25</span>
+                        </div>
+
+                        <div class="timeline-legend">
+                            <span class="tl-legend-item"><span class="tl-dot tl-teach"></span>بخش تدریس</span>
+                            <span class="tl-legend-item"><span class="tl-dot tl-break"></span>استراحت</span>
+                        </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sessions Content Sections -->
+            <section class="pad" id="climate">
+                <div class="shell">
+                    <h4>بخش اول</h4>
+                    <h2 class="h2 rv section-main-title">جلسات ۱ تا ۳: مبانی اقلیم و مدل‌سازی</h2>
+                    
+                    <div class="session-card rv">
+                        <h3>جلسه ۱: مبانی نرم‌افزاری و مدل‌سازی</h3>
+                        <ul>
+                            <li><span class="badge-part">پارت ۱</span> آشنایی با موتورهای شبیه‌سازی انرژی مانند EnergyPlus و Radiance</li>
+                            <li><span class="badge-part">پارت ۲</span> آشنایی با پلاگین‌های نرم‌افزارهای معماری مانند ClimateStudio، Ladybug Tools و DesignBuilder</li>
+                            <li><span class="badge-part">پارت ۳</span> آشنایی ابتدایی با محیط مدل‌سازی Rhino</li>
+                            <li><span class="badge-part">پارت ۴</span> آشنایی ابتدایی با محیط ویژوال پروگرمینگ Grasshopper</li>
+                        </ul>
+                    </div>
+
+                    <div class="session-card rv">
+                        <h3>جلسه ۲: فایل‌های اقلیمی EPW</h3>
+                        <ul>
+                            <li><span class="badge-part">پارت ۱</span> آشنایی با ساختار فایل‌های EPW و بررسی جمع‌آوری داده‌های اقلیمی</li>
+                            <li><span class="badge-part">پارت ۲</span> نحوه import فایل EPW به ClimateStudio در محیط راینو و گرسهاپر</li>
+                            <li><span class="badge-part">پارت ۳</span> معرفی نرم‌افزار Meteonorm برای ساخت فایل‌های EPW</li>
+                            <li><span class="badge-part">پارت ۴</span> معرفی نمودار خورشیدی (Sun Path Diagram) و نحوه ترسیم آن</li>
+                        </ul>
+                    </div>
+
+                    <div class="session-card rv">
+                        <h3>جلسه ۳: شاخص‌های اقلیمی و گلباد</h3>
+                        <ul>
+                            <li><span class="badge-part">پارت ۱</span> معرفی شاخص UTCI و نحوه محاسبه آن با استفاده از داده‌های EPW</li>
+                            <li><span class="badge-part">پارت ۲</span> آشنایی با نمودار سایکرومتریک (Psychrometric Chart) و ترسیم آن</li>
+                            <li><span class="badge-part">پارت ۳</span> بررسی نمودارهای گلباد (Wind Rose) و سرعت باد</li>
+                            <li><span class="badge-part">پارت ۴</span> نحوه ترسیم نمودارهای ترکیبی با استفاده از Grasshopper</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="pad" id="daylighting">
+                <div class="shell">
+                    <span class="eyebrow rv">بخش دوم</span>
+                    <h2 class="h2 rv section-main-title">جلسات ۴ تا ۹: شبیه‌سازی نور روز</h2>
+                    
+                    <div class="session-card rv">
+                        <h3>جلسه ۴: مبانی موتور Radiance</h3>
+                        <ul>
+                            <li><span class="badge-part">پارت ۱</span> معرفی موتور Radiance و ساختار شبیه‌سازی آن</li>
+                            <li><span class="badge-part">پارت ۲</span> آشنایی با انواع متریال‌ها و نحوه نوشتن متریال دلخواه بر اساس سینتکس Radiance</li>
+                            <li><span class="badge-part">پارت ۳ و ۴</span> مدل‌سازی سطح به سطح (surface by surface) محیط معماری در راینو و گرسهاپر</li>
+                        </ul>
+                    </div>
+
+                    <div class="session-card rv">
+                        <h3>جلسه ۵: شبیه‌سازی Point in Time</h3>
+                        <ul>
+                            <li><span class="badge-part">پارت ۱</span> معرفی انواع آسمان‌های CIE و انجام اولین شبیه‌سازی نور</li>
+                            <li><span class="badge-part">پارت ۲</span> معرفی موتور Rpict و شبیه‌سازی تصویر نقطه زمانی؛ بررسی تنظیمات ab و ad</li>
+                            <li><span class="badge-part">پارت ۳</span> نحوه ساخت انواع سنسور پوینت‌ها (سطح میز، دید کاربر و دلخواه)</li>
+                            <li><span class="badge-part">پارت ۴</span> شبیه‌سازی شبکه نقاط و استخراج نتایج به صورت نمودار حرارتی (Heat Map)</li>
+                        </ul>
+                    </div>
+
+                    <div class="session-card rv">
+                        <h3>جلسه ۶: شبیه‌سازی سالانه و خیرگی</h3>
+                        <ul>
+                            <li><span class="badge-part">پارت ۱</span> تاریخچه اعتبارسنجی نور و منطق شبیه‌سازی سالانه DC و Sky Matrix</li>
+                            <li><span class="badge-part">پارت ۲</span> معرفی شاخص‌های سالانه نور روز: DF، DA، sDA، UDI و ASE</li>
+                            <li><span class="badge-part">پارت ۳</span> تاریخچه شاخص خیرگی DGP و شبیه‌سازی آن</li>
+                            <li><span class="badge-part">پارت ۴</span> نحوه اضافه کردن نور مصنوعی و لایت پایپ (Light Pipe) به مدل</li>
+                        </ul>
+                    </div>
+
+                    <div class="session-card rv">
+                        <h3>جلسه ۷: متریال‌های داینامیک</h3>
+                        <ul>
+                            <li><span class="badge-part">پارت ۱</span> معرفی منطق Multiversal Ray Tracing برای شبیه‌سازی متریال‌های داینامیک</li>
+                            <li><span class="badge-part">پارت ۲</span> ساخت متریال‌های داینامیک (سایه‌انداز، برگ درخت و برف)</li>
+                            <li><span class="badge-part">پارت ۳</span> شبیه‌سازی میزان تابش و سنسورگذاری روی پوسته ساختمان</li>
+                            <li><span class="badge-part">پارت ۴</span> شبیه‌سازی میزان دید و تگ‌گذاری روی آبجکت‌ها</li>
+                        </ul>
+                    </div>
+
+                    <div class="session-card rv">
+                        <h3>جلسه ۸: نور طیفی و تأثیرات غیربصری</h3>
+                        <ul>
+                            <li><span class="badge-part">پارت ۱</span> معرفی تأثیرات غیربصری نور روز و شاخص‌های m-EDI و EML</li>
+                            <li><span class="badge-part">پارت ۲</span> ساخت متریال و آسمان طیفی (Spectral Sky) برای شبیه‌سازی</li>
+                            <li><span class="badge-part">پارت ۳ و ۴</span> معرفی پلاگین Hyperion و شبیه‌سازی نور طیفی سالانه</li>
+                        </ul>
+                    </div>
+
+                    <div class="session-card rv">
+                        <h3>جلسه ۹: رفع اشکال شبیه‌سازی نور</h3>
+                        <ul>
+                            <li><span class="badge-part">عمومی</span> رفع اشکال جامع و تمرین‌های کاربردی بخش نور روز</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="pad" id="energy">
+                <div class="shell">
+                    <span class="eyebrow rv">بخش سوم</span>
+                    <h2 class="h2 rv section-main-title">جلسات ۱۰ تا ۱۵: شبیه‌سازی انرژی</h2>
+                    
+                    <div class="session-card rv">
+                        <h3>جلسه ۱۰: مدل‌سازی حرارتی و زون‌بندی</h3>
+                        <ul>
+                            <li><span class="badge-part">پارت ۱ و ۲</span> مفهوم زون حرارتی و مدل‌سازی آن در گرسهاپر و راینو</li>
+                            <li><span class="badge-part">پارت ۳ و ۴</span> مدل‌سازی حرارتی سطحی و تعریف شید، زمین و سطوح آدیاباتیک</li>
+                        </ul>
+                    </div>
+
+                    <div class="session-card rv">
+                        <h3>جلسه ۱۱: متریال انرژی و زمان‌بندی‌ها</h3>
+                        <ul>
+                            <li><span class="badge-part">پارت ۱ و ۲</span> ساخت متریال‌های انرژی و معرفی پارامترهای U-value، R-value و SHGC</li>
+                            <li><span class="badge-part">پارت ۳ و ۴</span> ساخت برنامه‌های زمانی (Schedule) برای سیستم‌های برنامه‌پذیر</li>
+                        </ul>
+                    </div>
+
+                    <div class="session-card rv">
+                        <h3>جلسه ۱۲: سیستم‌های HVAC و انرژی</h3>
+                        <ul>
+                            <li><span class="badge-part">پارت ۱</span> معرفی انواع سیستم‌های تهویه مطبوع HVAC</li>
+                            <li><span class="badge-part">پارت ۲</span> ساخت سیستم HVAC و ضریب عملکرد COP</li>
+                            <li><span class="badge-part">پارت ۳</span> شبیه‌سازی انرژی در راینو و تنظیمات موتور EnergyPlus</li>
+                            <li><span class="badge-part">پارت ۴</span> استخراج نتایج شبیه‌سازی و بررسی شاخص مصرف انرژی EUI</li>
+                        </ul>
+                    </div>
+
+                    <div class="session-card rv">
+                        <h3>جلسه ۱۳: آسایش حرارتی و جریان هوا</h3>
+                        <ul>
+                            <li><span class="badge-part">پارت ۱</span> آشنایی با شاخص‌های آسایش حرارتی PMV، SET و PET</li>
+                            <li><span class="badge-part">پارت ۲</span> نحوه شبیه‌سازی و ارزیابی شاخص‌های آسایش حرارتی</li>
+                            <li><span class="badge-part">پارت ۳</span> معرفی روش‌های شبیه‌سازی جریان هوا و تحلیل CFD</li>
+                            <li><span class="badge-part">پارت ۴</span> شبیه‌سازی ساده‌سازی شده جریان هوا در فضای معماری</li>
+                        </ul>
+                    </div>
+
+                    <div class="session-card rv">
+                        <h3>جلسه ۱۴: پنل‌های خورشیدی</h3>
+                        <ul>
+                            <li><span class="badge-part">پارت ۱ و ۲</span> مبانی و اصول طراحی پنل‌های خورشیدی (Solar Panels)</li>
+                            <li><span class="badge-part">پارت ۳</span> نحوه تعریف و جایگذاری پنل‌های خورشیدی در ClimateStudio</li>
+                            <li><span class="badge-part">پارت ۴</span> شبیه‌سازی میزان برق تولیدی و مصرفی در حالت‌های On-grid و Off-grid</li>
+                        </ul>
+                    </div>
+
+                    <div class="session-card rv">
+                        <h3>جلسه ۱۵: رفع اشکال شبیه‌سازی انرژی</h3>
+                        <ul>
+                            <li><span class="badge-part">عمومی</span> رفع اشکال و پرسش و پاسخ تخصصی بخش انرژی</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="pad" id="optimization">
+                <div class="shell">
+                    <span class="eyebrow rv">بخش چهارم</span>
+                    <h2 class="h2 rv section-main-title">جلسه ۱۶: روش‌های بهینه‌یابی</h2>
+                    
+                    <div class="session-card rv">
+                        <h3>جلسه ۱۶: روش‌های بهینه‌یابی (Optimization)</h3>
+                        <ul>
+                            <li><span class="badge-part">پارت ۱ و ۲</span> بررسی روش‌های بهینه‌یابی فراابتکاری و جستجوی جامع در گرسهاپر</li>
+                            <li><span class="badge-part">پارت ۳</span> معرفی پلاگین‌های بهینه‌یابی شامل Galapagos، Colibri، Octopus و Wallacei</li>
+                            <li><span class="badge-part">پارت ۴</span> پیاده‌سازی عملی بهینه‌یابی با استفاده از پلاگین Colibri</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="foot">
+            <div class="shell">
+                <div class="footbar">
+                    <p> دکتر خوشبخت - درس آموزش معماری - طرح درس </p>
+                </div>
+            </div>
+        </footer>
+
+        <button class="up" id="up" aria-label="Back to top">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 19V6M6 12l6-6 6 6" />
+            </svg>
+        </button>
+        <script src="templatemo-633-celadon-script.js"></script>
+    </body>
+</html>
